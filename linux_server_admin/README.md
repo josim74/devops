@@ -1,3 +1,5 @@
+# Linux Administration
+
 Directory Structure
 -------------------------
 Common directory:
@@ -29,5 +31,3 @@ Common directory:
 /srv/www Web server files
 /srv/ftp	Ftp files
 /sys	Used to display and sometimes configure the divices known to the linux kernel
-
-
