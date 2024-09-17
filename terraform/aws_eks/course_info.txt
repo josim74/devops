@@ -1,0 +1,5 @@
+Deadline : In sha Allah by January
+
+Course name: Terraform on AWS EKS Kubernetes IaC SRE- 50 Real-World Demos
+Course URL: https://samsungu.udemy.com/course/terraform-on-aws-eks-kubernetes-iac-sre-50-real-world-demos/learn/lecture/30090234#overview
+Source (Github): https://github.com/josim74/terraform-on-aws-eks
