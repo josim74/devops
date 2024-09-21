@@ -1,0 +1,4 @@
+.vagrant/
+.terraform/
+*.lock.hcl
+*.tfstate.backup
