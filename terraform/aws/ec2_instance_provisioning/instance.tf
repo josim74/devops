@@ -28,3 +28,9 @@ resource "aws_instance" "tf-instance" {
     host        = self.public_ip
   }
 }
+output "publict_ip" {
+  value = aws_instance.tf-instance.public_ip
+}
+output "private_ip" {
+  value = aws_instance.tf-instance.private_ip
+}
