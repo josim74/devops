@@ -1,4 +1,5 @@
 # AWS Setup Instructions
+This directory will contain all aws learnings and practices. For project based work (check out the ci_cd directory).
 
 <details>
   <summary>Create IAM User and Add MFA Device</summary>
