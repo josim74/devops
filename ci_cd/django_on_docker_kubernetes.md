@@ -1,40 +1,29 @@
 # Django with Docker and Kubernetes
-## Dependencies
-Django v4.2.3
-Docker v24.0.2
-Python v3.11.4
 
 ## Table of Contents
 
-1. [Introduction](#introduction)
-2. [Key Concepts](#key-concepts)
-   - [Pods](#pods)
-   - [Services](#services)
-   - [Deployments](#deployments)
-   - [Namespaces](#namespaces)
-3. [Installation](#installation)
-   - [Using Minikube](#using-minikube)
-   - [Using Kubernetes on Cloud (GKE, EKS, AKS)](#using-kubernetes-on-cloud)
-4. [Configuration](#configuration)
-   - [kubectl Configuration](#kubectl-configuration)
-   - [YAML Files](#yaml-files)
-5. [Usage](#usage)
-   - [Creating a Pod](#creating-a-pod)
-   - [Scaling Deployments](#scaling-deployments)
-   - [Exposing Services](#exposing-services)
-6. [Advanced Topics](#advanced-topics)
-   - [Helm Charts](#helm-charts)
-   - [StatefulSets](#statefulsets)
-   - [Networking in Kubernetes](#networking-in-kubernetes)
-7. [Troubleshooting](#troubleshooting)
-8. [Best Practices](#best-practices)
-9. [References](#references)
+1. [Overview](#overview)
+2. [Dependencies](#dependencies)
+3. [Django](#django)
+4. [Docker](#docker)
+5. [PostgreSQL](#postgresql)
+6. [Notes](#notes)
+7. [Gunicorn](#gunicorn)
+8. [Production Dockerfile](#production-dockerfile)
+9. [Static Files](#static-files)
+10. [Media Files](#media-files)
+11. [Production Update](#production-update)
+12. [Conclusion](#conclusion)
 
 ---
 
 ## Overview
+In this CI/CD project, I will develop a Django application from scratch, containerize it, and run it using Docker Compose. The objective is to follow best practices for production-level deployment as closely as possible. Subsequently, I will deploy the application in a Kubernetes cluster using Minikube (a local setup, with an emphasis on production-level best practices). **This documentation serves as an instructional guide, focusing on concise steps rather than detailed explanations.**
 
-Kubernetes is an open-source platform designed to automate deploying, scaling, and operating containerized applications. It helps manage clusters of containers at scale and provides a robust ecosystem for container orchestration.
+## Dependencies
+- Django v4.2.3
+- Docker v24.0.2
+- Python v3.11.4
 
 ## Django
 1. Project setup
@@ -132,7 +121,7 @@ Kubernetes is an open-source platform designed to automate deploying, scaling, a
     docker-compose up -d
     ```
     - Navigate to http://localhost:8000 to again view the welcome screen
-## Postgres
+## PostgreSQL
 1. Update `django-on-dockr/docker-compose.yml` adding new service `db`
     ```yaml
     version: '3.8'
@@ -873,5 +862,5 @@ In terms of actual deployment to a production environment, you'll probably want 
 1. Fully managed database service -- like RDS or Cloud SQL -- rather than managing your own Postgres instance within a container.
 2. Non-root user for the db and nginx services
 
-For other production tips, review [this discussion](https://www.reddit.com/r/django/comments/bjgod8/dockerizing_django_with_postgres_gunicorn_and/).
+## [Next: Deployment in Kubernetes cluster](https://github.com/josim74/devops/blob/main/kubernetes/django_on_kubernetes.md)
 

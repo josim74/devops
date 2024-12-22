@@ -1,4 +1,4 @@
-This part is being continued from [Django with Docker and Kubernetes](https://github.com/josim74/devops/blob/main/ci_cd/django_on_docker_kubernetes.md)
+### This part is being continued from [Django with Docker and Kubernetes](https://github.com/josim74/devops/blob/main/ci_cd/django_on_docker_kubernetes.md)
 
 ## Create kubernetes manifest files using project files as follows
 1. Create `django-configmap.yml` and `django-secret.yml` from `env.prod` and `env.prod.db`
