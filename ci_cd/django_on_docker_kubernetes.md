@@ -862,5 +862,8 @@ In terms of actual deployment to a production environment, you'll probably want 
 1. Fully managed database service -- like RDS or Cloud SQL -- rather than managing your own Postgres instance within a container.
 2. Non-root user for the db and nginx services
 
+## Acknowledgement
+To get started with containerizing and orchestrating my Django project, I followed the detailed steps outlined in [this blog](https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/). Building on that foundation, I created my own concise version of the steps for better clarity and ease of reference. **From there, I have expanded further into the Kubernetes deployment (next) part, which is entirely my original work.**
+
 ## [Next: Deployment in Kubernetes cluster](https://github.com/josim74/devops/blob/main/kubernetes/django_on_kubernetes.md)
 
