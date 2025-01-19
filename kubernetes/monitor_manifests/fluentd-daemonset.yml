@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: fluentd
+  namespace: monitor
+spec:
+  selector:
+    matchLabels:
+      app: fluentd
+  template:
+    metadata:
+      labels:
+        app: fluentd
+    spec:
+      containers:
+        - name: fluentd
+          image: fluent/fluentd:v1.14-1
+          volumeMounts:
+            - name: config-volume
+              mountPath: /fluentd/etc
+              # subPath: fluentd.conf
+            - name: varlog
+              mountPath: /var/log
+          env:
+            - name: FLUENTD_ARGS
+              value: "--no-supervisor -q"
+      volumes:
+        - name: config-volume
+          configMap:
+            name: fluentd-config
+        - name: varlog
+          hostPath:
+            path: /var/log

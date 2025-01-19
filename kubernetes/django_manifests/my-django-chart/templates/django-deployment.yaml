@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: django-app
+  namespace: django
+spec:
+  replicas: {{ .Values.django.replicas }}
+  selector:
+    matchLabels:
+      app: django-app
+  template:
+    metadata:
+      labels:
+        app: django-app
+    spec:
+      containers:
+        - name: django
+          image: {{ .Values.django.image.repository }}:{{ .Values.django.image.tag }}
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: django-config
+            - secretRef:
+                name: django-secret
+          volumeMounts:
+            - name: static-files
+              mountPath: /home/app/web/staticfiles
+            - name: media-files
+              mountPath: /home/app/web/mediafiles
+          command: ["gunicorn", "hello_django.wsgi:application", "--bind", "0.0.0.0:8000"]
+      volumes:
+        - name: static-files
+          persistentVolumeClaim:
+            claimName: static-files-pvc
+        - name: media-files
+          persistentVolumeClaim:
+            claimName: media-files-pvc

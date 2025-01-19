@@ -15,7 +15,7 @@ This directory will contain all aws learnings and practices. For project based w
     - **I want to create an IAM user**
     - **Auto-generate password**
     - **User must create a new password at next login**
-6. Click **Next**.
+6. Click **Next**
 7. Attach the required policies by checking **AdministratorAccess**.
 8. Click **Next** > **Create User**.
 9. Download the CSV file containing user credentials.

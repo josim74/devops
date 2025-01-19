@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-config
+  namespace: django
+data:
+  DJANGO_ALLOWED_HOSTS: "*"
+  SQL_ENGINE: "django.db.backends.postgresql"
+  SQL_DATABASE: "hello_django_prod"
+  SQL_USER: "hello_django"
+  SQL_HOST: "db"
+  SQL_PORT: "5432"
+  DATABASE: "postgres"
+  CSRF_TRUSTED_ORIGINS: "http://127.0.0.1:64262 http://192.168.49.2:30005"

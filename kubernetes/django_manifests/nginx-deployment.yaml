@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: django
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:1.25
+          resources:
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: static-files
+              mountPath: /home/app/web/staticfiles
+            - name: media-files
+              mountPath: /home/app/web/mediafiles
+            - name: nginx-config
+              mountPath: /etc/nginx/conf.d
+              # subPath: nginx.conf
+      volumes:
+        - name: static-files
+          persistentVolumeClaim:
+            claimName: static-files-pvc
+        - name: media-files
+          persistentVolumeClaim:
+            claimName: media-files-pvc
+        - name: nginx-config
+          configMap:
+            name: nginx-config
