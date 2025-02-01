@@ -1,7 +1,7 @@
 ## Info
-1. Source code link: https://github.com/Learn-It-Right-Way/lirw-react-node-mysql-app
-1. Branch: feature/add-logging
-2. Edit source code
+1. [Three Tier Project GitHub URL](https://github.com/josim74/react-node-mysql-app)
+2. Branch: feature/add-logging
+3. Edit source code
    - Add logging in the backend and frontend
    - Add a new route to health check
 # AWS
