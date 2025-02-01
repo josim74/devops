@@ -1,6 +1,7 @@
 .vagrant/
 .terraform/
 .DS_Store
+.obsidian/
 *.tfstate
 *.lock.hcl
 *.tfstate.backup
