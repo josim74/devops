@@ -78,5 +78,8 @@ You can check the availability of AWS services in specific regions using:
 - **Latency**: Choose regions and AZs close to your users for better performance.
 - **Disaster Recovery**: Use multi-region or multi-AZ architectures for high availability.
 
+### IAM and AWS CLI:
+
+
 
 
