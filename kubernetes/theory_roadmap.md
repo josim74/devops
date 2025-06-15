@@ -311,3 +311,89 @@ Kubernetes **uses** Docker (or other runtimes like `containerd`) under the hood 
 ### 💡 Key Takeaway
 
 > Kubernetes is to containers what an operating system is to processes — it abstracts the infrastructure and provides automation, scalability, and management features for containerized applications.
+Awesome! Let's dive into **Level 2: Kubernetes Architecture** — understanding how a Kubernetes cluster works internally is crucial to mastering it.
+
+
+## ⚙️ Level 2: Kubernetes Architecture
+
+
+### 🏗️ What is a Kubernetes Cluster?
+
+A **Kubernetes cluster** is a set of machines (virtual or physical) that work together to run containerized applications. It consists of:
+
+1. **Control Plane (Master Node)** — brain of the cluster
+2. **Worker Nodes** — machines that run the actual applications (pods)
+
+
+## 🧠 Control Plane Components (Runs on Master Node)
+
+The **Control Plane** manages the entire cluster and makes decisions like scheduling, responding to cluster events, and maintaining cluster state.
+
+| Component                    | Role                                                                                    |
+| ---------------------------- | --------------------------------------------------------------------------------------- |
+| **kube-apiserver**           | Front door of the cluster — accepts REST API requests (via `kubectl`, dashboards, etc.) |
+| **etcd**                     | Distributed key-value store — stores all cluster state/configuration                    |
+| **kube-scheduler**           | Assigns pods to nodes based on resources and constraints                                |
+| **kube-controller-manager**  | Runs controllers like node, replication, and job controllers                            |
+| **cloud-controller-manager** | Interacts with underlying cloud provider (optional on local clusters)                   |
+
+> All communication in Kubernetes happens **through the API Server**, even internally.
+
+
+## 🔧 Node Components (Runs on Worker Nodes)
+
+Each **Worker Node** is responsible for running containerized workloads.
+
+| Component             | Role                                                                                                             |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| **kubelet**           | Agent running on each node that communicates with the control plane. Ensures containers are running as expected. |
+| **kube-proxy**        | Handles networking — manages IP routing, NAT, and load balancing for services.                                   |
+| **Container Runtime** | Software that runs containers (Docker, containerd, CRI-O)                                                        |
+
+
+## 🖼️ Cluster Diagram
+
+```
++-----------------------+                +---------------------------+
+|     Control Plane     |                |        Worker Node        |
+|-----------------------|                |---------------------------|
+| kube-apiserver        | <=====>        | kubelet                   |
+| etcd (store)          |                | kube-proxy                |
+| kube-scheduler        |                | Container Runtime         |
+| controller-manager(s) |                | +----------------------+  |
+| cloud-controller      |                | |   Pod (1+ containers) | |
++-----------------------+                | +----------------------+  |
+                                         +---------------------------+
+```
+
+
+## 🌀 Internal Communication Flow
+
+1. You run: `kubectl apply -f my-app.yaml`
+2. **kubectl sends the request to the API Server**: `kubectl` reads the YAML file and sends an **HTTP request** (usually `POST` or `PATCH`) to the **kube-apiserver**, depending on whether it's creating or updating resources. The request is authenticated and authorized via RBAC (Role-Based Access Control).
+3. **kube-apiserver stores the desired state in etcd**: Once validated, the `kube-apiserver` stores the object definition (e.g., a Deployment) into the **etcd database**, which is the **single source of truth** for the cluster. Like - Object kind (Deployment), replica count, image, labels, selectors, ports, etc.
+4. **kube-controller-manager notices the change**: The **Deployment Controller** (inside `kube-controller-manager`) is constantly watching the `apiserver` (via the **watch API**) for new or modified Deployments. It compares the current state vs the desired state. If 0 Pods are running and 3 are desired, it needs to create 3 Pods.
+5. **Deployment controller creates a ReplicaSet:** The controller creates a **ReplicaSet** object and stores it via the `apiserver`. Then it asks the **ReplicaSet Controller** to create the required number of **Pod** objects.
+6. **kube-scheduler assigns Pods to Nodes:** Now, there are unscheduled Pods (i.e., Pods without a Node assignment). The **kube-scheduler** watches the `apiserver` for unscheduled Pods. It evaluates - Node capacity (CPU, RAM), Node taints/tolerations, Pod affinity/anti-affinity, and Custom scheduling rules. Once it selects the best Node, it updates the Pod object with `.spec.nodeName`
+7. **kubelet on the target node gets the instruction:** On each Node, a **kubelet** is running and constantly watches for Pod specs assigned to it (via the API Server). The kubelet sees that a new Pod needs to be created on that Node.
+8. **kubelet talks to the container runtime:** The kubelet passes the Pod specification to the **container runtime** (e.g., containerd, Docker). The runtime pulls the specified container image from the registry (Docker Hub, ECR, GCR, etc.). It then starts the container(s) defined in the Pod spec.
+9. **kubelet updates status:** kubelet informs the **apiserver** about the Pod’s actual status - "Pulling image...", "Started container", "Pod is running". This allows tools like `kubectl get pods` to show real-time information.
+10. **kube-proxy enables networking:** If the Pod exposes a port and is part of a Service, **kube-proxy** sets up - `IPTables or IPVS rules for load balancing`, `DNS routing to the correct backend Pods`. This allows communication **within the cluster** and possibly **from outside** (if using NodePort/LoadBalancer/Ingress)
+11. **Cluster is in desired state:** At this point - `Your Pods are scheduled`, `Containers are running`, `Services are reachable`, `Status is monitored`. If anything fails (e.g., container crash), the **controller manager** ensures the system tries to restore the desired state (e.g., restart the Pod).
+
+
+## 🧪 Additional Notes
+
+* All master components **can be HA (Highly Available)** in production.
+* The control plane can **run on a dedicated node** or **on worker nodes** in small setups (like Minikube).
+* Kubernetes is **declarative**: You tell it what you want, and it tries to make it happen and maintain it.
+
+
+### ✅ Summary
+
+* **Control Plane = brains** of the cluster
+* **Worker Nodes = muscle**, running actual workloads
+* All components communicate through the **kube-apiserver**
+* Cluster state is **persisted in etcd**
+
+
