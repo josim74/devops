@@ -1,8 +1,84 @@
+# 📘 Phase 1: Kubernetes Theory (Foundational)
+
+#### **1. What is Kubernetes?**
+
+* Definition and role in modern DevOps
+* Key problems Kubernetes solves (scaling, self-healing, deployments, etc.)
+
+#### **2. Kubernetes Architecture**
+
+* Master Node vs Worker Node
+* Core components:
+
+  * **API Server**
+  * **etcd**
+  * **Controller Manager**
+  * **Scheduler**
+  * **Kubelet**
+  * **Kube Proxy**
+  * **Container Runtime**
+
+#### **3. Kubernetes Objects**
+
+* Pod (smallest unit of deployment)
+* ReplicaSet
+* Deployment
+* Service (ClusterIP, NodePort, LoadBalancer)
+* Namespace
+* ConfigMap & Secret
+* PersistentVolume (PV) & PersistentVolumeClaim (PVC)
+* StatefulSet & DaemonSet
+
+#### **4. Cluster Networking**
+
+* Pod-to-Pod communication
+* Service networking
+* CNI (Container Network Interface) plugins overview
+
+#### **5. Controllers and Scheduling**
+
+* How pods are scheduled
+* Lifecycle of a Pod
+* Health checks: Liveness and Readiness Probes
+
+#### **6. Ingress and Load Balancing**
+
+* Ingress Controllers
+* Routing external traffic
+* TLS termination
+
+#### **7. Config & Storage Management**
+
+* ConfigMaps vs Secrets
+* Volumes in Kubernetes
+* Persistent storage using PV/PVC
+
+#### **8. RBAC and Security**
+
+* Roles, ClusterRoles
+* RoleBindings, ClusterRoleBindings
+* ServiceAccounts
+* Network Policies
+
+#### **9. Logging and Monitoring (Overview)**
+
+* Metrics Server
+* Prometheus + Grafana
+* Logging with Fluentd, ELK, etc.
+
+#### **10. Helm (Optional for later)**
+
+* Helm charts
+* Helm v3 basics
+
+  
+---
+
+
+
 # 📘 Kubernetes Theory Roadmap
 
 A structured guide to build strong foundational knowledge of Kubernetes before moving to hands-on practice.
-
----
 
 ## 🔰 Level 1: Introduction & Fundamentals
 
@@ -19,8 +95,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - Node (Master & Worker)
   - Pod (smallest deployable unit)
 
----
-
 ## ⚙️ Level 2: Kubernetes Architecture
 
 ### ✅ Goal: Learn about cluster internals and major components
@@ -36,8 +110,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
 - kubelet
 - kube-proxy
 - Container Runtime (Docker, containerd, CRI-O)
-
----
 
 ## 🧱 Level 3: Kubernetes Objects & Workloads
 
@@ -57,8 +129,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
 ### Declarative Management:
 - Anatomy of a YAML manifest
 - kubectl apply vs create
-
----
 
 ## 🌐 Level 4: Networking in Kubernetes
 
@@ -84,8 +154,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - Calico
   - Cilium
 
----
-
 ## 🔐 Level 5: Security in Kubernetes
 
 ### ✅ Goal: Secure access and communication within the cluster
@@ -105,8 +173,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - When to use which
   - Best practices
 
----
-
 ## 🗂️ Level 6: Configuration & Storage
 
 ### ✅ Goal: Manage data, secrets, and configurations properly
@@ -124,8 +190,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - PersistentVolume (PV)
   - PersistentVolumeClaim (PVC)
   - StorageClass & dynamic provisioning
-
----
 
 ## 📋 Level 7: Observability
 
@@ -149,8 +213,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - Elasticsearch
   - Kibana (EFK Stack)
 
----
-
 ## 📦 Level 8: Helm - Kubernetes Package Manager
 
 ### ✅ Goal: Manage applications using Helm
@@ -169,8 +231,6 @@ A structured guide to build strong foundational knowledge of Kubernetes before m
   - templates/
   - values.yaml
 
----
-
 ## ✅ Final Outcome:
 
 By completing all levels, you should be able to:
@@ -180,7 +240,3 @@ By completing all levels, you should be able to:
 - Configure networking, security, and storage
 - Monitor applications and system health
 - Use Helm for application deployment
-
----
-
-### 🛠️ Next Step: Start Level 1 → **"What is Kubernetes?"**
