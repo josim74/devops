@@ -616,3 +616,196 @@ spec:                      # Desired state
 | Job         | Run-to-completion task       | One-time tasks, scripts        |
 | CronJob     | Scheduled recurring Job      | Backups, reports               |
 | Namespace   | Isolates resources           | Multi-team, multi-env          |
+
+Awesome! Let’s dive into one of the most critical topics in Kubernetes: **Level 4: Networking in Kubernetes**.
+
+
+## 🌐 Level 4: Networking in Kubernetes
+
+Networking is essential for Kubernetes because it enables:
+
+* Communication between **Pods**
+* Access to services **within the cluster**
+* Exposure of services **to the outside world**
+
+
+### 📦 1. Kubernetes Networking Model
+
+Kubernetes follows **two key rules**:
+
+1. **Every Pod gets its own IP address**
+2. **All Pods can communicate with each other without NAT**
+
+This means:
+
+* No need to map container ports to host ports.
+* Flat network across the cluster.
+
+
+### 🧱 2. Basic Components of Networking
+
+| Component             | Purpose                                                       |
+| --------------------- | ------------------------------------------------------------- |
+| **Pod Network (CNI)** | Enables Pod-to-Pod communication across Nodes                 |
+| **Service**           | Provides a stable IP and DNS name for a group of Pods         |
+| **kube-proxy**        | Handles routing traffic to the right Pods using iptables/IPVS |
+| **Ingress**           | Manages external HTTP/S access to services                    |
+
+
+## 🛣️ 3. Container Network Interface (CNI)
+
+* Kubernetes itself doesn’t implement networking — it uses **CNI plugins**.
+* Common CNI providers:
+
+  * **Calico**
+  * **Flannel**
+  * **Cilium**
+  * **Weave**
+
+These:
+
+* Assign IP addresses to Pods
+* Set up routing between Nodes and Pods
+
+
+### 🔗 4. Service Types in Kubernetes
+
+Kubernetes **Service** is an abstraction to expose your app running in Pods.
+
+#### 📘 ClusterIP (default)
+
+* Accessible **only within** the cluster
+* Ideal for **internal microservices**
+
+```yaml
+spec:
+  type: ClusterIP
+```
+
+#### 🌐 NodePort
+
+* Exposes service on **<NodeIP>:<Port>**
+* Works outside the cluster
+* Limited port range (30000–32767)
+
+```yaml
+spec:
+  type: NodePort
+```
+
+#### 🚀 LoadBalancer
+
+* Uses **cloud provider’s load balancer**
+* Best for production-grade **external traffic**
+* Requires cloud support (e.g., AWS, GCP)
+
+```yaml
+spec:
+  type: LoadBalancer
+```
+
+#### 🌍 ExternalName
+
+* Maps the service to an **external DNS name**
+* Acts as a proxy
+
+```yaml
+spec:
+  type: ExternalName
+  externalName: my.db.com
+```
+
+
+## 🧭 5. DNS in Kubernetes
+
+* Every service gets a **DNS name** like:
+
+  ```
+  <service>.<namespace>.svc.cluster.local
+  ```
+* The **CoreDNS** service handles this internally.
+* Example:
+
+  * You can access `my-api` from another Pod with:
+
+    ```
+    http://my-api.default.svc.cluster.local
+    ```
+
+
+## 🌉 6. Ingress & Ingress Controller
+
+* **Ingress** allows HTTP/S access to Services using:
+
+  * Hostnames
+  * Paths (e.g., `/api`, `/admin`)
+* Requires an **Ingress Controller** like:
+
+  * NGINX Ingress Controller
+  * Traefik
+  * AWS ALB Ingress Controller
+
+📄 Example:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-ingress
+spec:
+  rules:
+    - host: myapp.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service
+                port:
+                  number: 80
+```
+
+
+### 🔐 7. Network Policies
+
+By default, **all Pods can talk to each other**. If you want to **restrict communication**, use **NetworkPolicies**.
+
+* Define:
+
+  * Which Pods can **ingress** (receive) traffic
+  * Which Pods can **egress** (send) traffic
+
+📄 Example:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: deny-external
+spec:
+  podSelector:
+    matchLabels:
+      app: my-app
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app: allowed-pod
+```
+
+
+### 🧠 Summary Table
+
+| Concept                | Role                               | Scope/Example                       |
+| ---------------------- | ---------------------------------- | ----------------------------------- |
+| Pod IP                 | Unique to each Pod                 | Pod-to-Pod communication            |
+| Service (ClusterIP)    | Internal load balancing            | microservice-to-microservice        |
+| Service (NodePort)     | External access via Node IP + port | dev/test cluster external access    |
+| Service (LoadBalancer) | External access with cloud LB      | Production deployments on cloud     |
+| Ingress                | Advanced HTTP routing              | `myapp.com/api` → `backend-service` |
+| CNI Plugin             | Provides Pod IPs, routing          | Flannel, Calico, Cilium             |
+| NetworkPolicy          | Restricts Pod-level network access | Like firewall rules for Pods        |
+
