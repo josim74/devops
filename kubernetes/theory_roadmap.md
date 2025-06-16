@@ -396,4 +396,223 @@ Each **Worker Node** is responsible for running containerized workloads.
 * All components communicate through the **kube-apiserver**
 * Cluster state is **persisted in etcd**
 
+Great! Let’s move on to **Level 3: Kubernetes Objects & Workloads** — the building blocks of everything you deploy in Kubernetes.
 
+
+## 🧱 Level 3: Kubernetes Objects & Workloads
+
+These are the core **resources** you define in YAML files and manage using `kubectl`. They represent your applications, configurations, and how Kubernetes should manage them.
+
+
+### 🔹 1. **Pods** (The smallest deployable unit)
+
+A **Pod** is a wrapper around one or more containers that:
+
+* Share the same network namespace (IP, port space)
+* Can communicate via `localhost`
+* Can share storage volumes
+
+Most of the time, a Pod runs a **single container**. You might use multiple containers in one Pod if they must run together (e.g., log sidecar + main app).
+
+📄 Example:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: my-pod
+spec:
+  containers:
+    - name: app
+      image: nginx
+```
+
+
+### 🔹 2. **ReplicaSet**
+
+Ensures a specified **number of Pod replicas** are running at any given time.
+
+* Automatically replaces crashed Pods
+* Scales up/down as needed
+* Used **indirectly** — usually managed by a Deployment
+
+📄 Example:
+
+```yaml
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: my-replicaset
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: demo
+  template:
+    metadata:
+      labels:
+        app: demo
+    spec:
+      containers:
+        - name: nginx
+          image: nginx
+```
+
+
+### 🔹 3. **Deployment**
+
+A **higher-level controller** that manages ReplicaSets and provides:
+
+* **Declarative updates**
+* **Rollbacks**
+* **Rollouts**
+* Version tracking
+
+This is the most commonly used object for running stateless applications.
+
+📄 Example:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: nginx
+```
+
+
+### 🔹 4. **StatefulSet**
+
+Used for **stateful applications**, like databases.
+
+* Gives each Pod a **stable identity** (DNS, storage)
+* Ensures **ordered startup and shutdown**
+* Works with **PersistentVolumeClaims**
+
+📄 Use cases:
+
+* MySQL, MongoDB, Elasticsearch
+
+
+### 🔹 5. **DaemonSet**
+
+Ensures a copy of a Pod **runs on all (or some) nodes**.
+
+* Often used for:
+
+  * Logging agents (Fluentd)
+  * Monitoring agents (Node Exporter)
+  * Security scanners
+
+📄 Example use:
+
+```yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: node-monitor
+spec:
+  selector:
+    matchLabels:
+      name: monitor
+  template:
+    metadata:
+      labels:
+        name: monitor
+    spec:
+      containers:
+        - name: monitor-agent
+          image: monitoring/agent
+```
+
+
+### 🔹 6. **Job and CronJob**
+
+* **Job**: Runs a task to **completion**, e.g., a backup script.
+* **CronJob**: Runs Jobs **on a schedule**, like cron in Linux.
+
+📄 Job Example:
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello
+spec:
+  template:
+    spec:
+      containers:
+        - name: hello
+          image: busybox
+          command: ["echo", "Hello Kubernetes"]
+      restartPolicy: Never
+```
+
+
+### 📂 7. Namespaces
+
+Namespaces allow you to **partition a cluster** into multiple environments:
+
+* Isolate workloads (dev, staging, prod)
+* Apply resource quotas and RBAC policies per namespace
+
+📄 Create:
+
+```bash
+kubectl create namespace my-namespace
+```
+
+
+### 🧬 8. Anatomy of a Kubernetes YAML File
+
+Every Kubernetes manifest has a common structure:
+
+```yaml
+apiVersion: apps/v1        # API version
+kind: Deployment           # Type of resource
+metadata:                  # Name, labels
+  name: my-app
+spec:                      # Desired state
+  replicas: 3
+  selector: {...}
+  template:
+    metadata: {...}
+    spec:
+      containers:
+        - name: app
+          image: my-image
+```
+
+
+### ⚙️ `kubectl` Tips
+
+* `kubectl apply -f file.yaml` — create or update resources
+* `kubectl get pods` — list Pods
+* `kubectl describe pod pod-name` — detailed info and events
+* `kubectl delete -f file.yaml` — delete defined resources
+
+
+### ✅ Summary
+
+| Object      | Purpose                      | Typical Use Case               |
+| ----------- | ---------------------------- | ------------------------------ |
+| Pod         | Runs 1+ containers           | Base unit in Kubernetes        |
+| ReplicaSet  | Maintains a stable Pod count | Used internally by Deployments |
+| Deployment  | Manages stateless apps       | Web apps, microservices        |
+| StatefulSet | Runs stateful apps           | Databases, brokers             |
+| DaemonSet   | Runs a Pod on every Node     | Monitoring, logging            |
+| Job         | Run-to-completion task       | One-time tasks, scripts        |
+| CronJob     | Scheduled recurring Job      | Backups, reports               |
+| Namespace   | Isolates resources           | Multi-team, multi-env          |
