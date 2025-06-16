@@ -809,3 +809,183 @@ spec:
 | CNI Plugin             | Provides Pod IPs, routing          | Flannel, Calico, Cilium             |
 | NetworkPolicy          | Restricts Pod-level network access | Like firewall rules for Pods        |
 
+Perfect! Now we move into **Level 5: Storage in Kubernetes** — a crucial concept when running **stateful applications**, backups, caching, and persistent user data.
+
+
+## 💾 Level 5: Storage in Kubernetes
+
+Kubernetes abstracts storage using a concept called **Volumes**, which can outlive containers and connect to external storage systems.
+
+
+### 📦 1. Volumes (Basic)
+
+* A **Volume** in Kubernetes is a directory accessible to containers in a Pod.
+* Unlike container storage (`/tmp`, etc.), data in a volume **persists across container restarts**.
+* Volumes are declared in the Pod’s spec and mounted inside containers.
+
+📄 Basic Example:
+
+```yaml
+spec:
+  volumes:
+    - name: data-volume
+      emptyDir: {}  # Creates temporary volume in node
+  containers:
+    - name: app
+      image: busybox
+      volumeMounts:
+        - mountPath: /data
+          name: data-volume
+```
+
+🔹 `emptyDir` is erased when the Pod is deleted — suitable for scratch space or caching.
+
+
+### 🗃️ 2. Persistent Volumes (PV) & Persistent Volume Claims (PVC)
+
+To support **persistent** storage (e.g., database data), Kubernetes separates storage into two objects:
+
+| Resource                        | Purpose                                                       |
+| ------------------------------- | ------------------------------------------------------------- |
+| **PersistentVolume (PV)**       | Represents an actual storage resource (disk, NFS, cloud disk) |
+| **PersistentVolumeClaim (PVC)** | A request for a specific amount/type of storage               |
+
+📄 **1. Create a PersistentVolume:**
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: my-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /mnt/data
+```
+
+📄 **2. Create a PersistentVolumeClaim:**
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+```
+
+📄 **3. Use in a Pod:**
+
+```yaml
+volumes:
+  - name: data-storage
+    persistentVolumeClaim:
+      claimName: my-pvc
+```
+
+
+### 🔁 3. Dynamic Provisioning
+
+If you’re on a cloud or using a storage plugin, you can **dynamically provision storage** using a **StorageClass**.
+
+📄 Example:
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast-storage
+provisioner: kubernetes.io/aws-ebs  # Or GCP, Azure
+parameters:
+  type: gp2
+```
+
+Then in your PVC:
+
+```yaml
+spec:
+  storageClassName: fast-storage
+```
+
+Kubernetes will create a disk on-the-fly when the PVC is created.
+
+
+### 📑 4. Access Modes
+
+| Mode                  | Description                             |
+| --------------------- | --------------------------------------- |
+| `ReadWriteOnce (RWO)` | Mounted as read-write by **one** node   |
+| `ReadOnlyMany (ROX)`  | Mounted read-only by **many** nodes     |
+| `ReadWriteMany (RWX)` | Mounted as read-write by **many** nodes |
+
+Not all storage backends support all modes. RWX is rare on cloud block storage but available with NFS/Ceph/etc.
+
+
+### 🧊 5. Volume Types
+
+| Volume Type             | Description                    |
+| ----------------------- | ------------------------------ |
+| `emptyDir`              | Temporary scratch space        |
+| `hostPath`              | Mounts a path from host node   |
+| `nfs`                   | Mounts external NFS            |
+| `awsElasticBlockStore`  | AWS EBS volume                 |
+| `configMap`             | Mount config data as files     |
+| `secret`                | Mount secrets (base64-encoded) |
+| `persistentVolumeClaim` | Bind to a PersistentVolume     |
+
+
+### 🔐 6. Secrets & ConfigMaps as Volumes
+
+* **Secrets** store sensitive data (e.g., passwords, API keys)
+* **ConfigMaps** store configuration (e.g., environment settings)
+
+📄 Mount as file or inject as env variable:
+
+```yaml
+volumes:
+  - name: config
+    configMap:
+      name: app-config
+```
+
+
+### 💡 7. StatefulSet & VolumeClaimTemplates
+
+StatefulSets use **VolumeClaimTemplates** to give each Pod its own volume:
+
+📄 Example:
+
+```yaml
+volumeClaimTemplates:
+  - metadata:
+      name: data
+    spec:
+      accessModes: ["ReadWriteOnce"]
+      resources:
+        requests:
+          storage: 1Gi
+```
+
+Result:
+
+* pod-0 gets `data-pod-0`
+* pod-1 gets `data-pod-1`
+
+
+### ✅ Summary
+
+| Concept                                | Role                                       |
+| -------------------------------------- | ------------------------------------------ |
+| `Volume`                               | Temporary shared directory for a Pod       |
+| `PersistentVolume (PV)`                | Actual provisioned disk/storage            |
+| `PersistentVolumeClaim (PVC)`          | Request for storage from a Pod             |
+| `StorageClass`                         | Defines how dynamic storage is provisioned |
+| `StatefulSet` + `VolumeClaimTemplates` | Per-Pod persistent disks                   |
+
